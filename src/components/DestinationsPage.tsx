@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Star, MapPin, Clock, Car, Mountain, Castle, Leaf, Globe } from 'lucide-react';
+import { FiGlobe, FiMapPin, FiClock, FiStar, FiArrowUpRight } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
+
 
 const DestinationsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -139,10 +142,6 @@ const DestinationsPage: React.FC = () => {
     cultural: <Globe className="h-4 w-4" />,
     default: <Star className="h-4 w-4" />
   };
-
-  function onNavigate(arg0: string): void {
-    throw new Error('Function not implemented.');
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-amber-50">
@@ -287,25 +286,114 @@ const DestinationsPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Enhanced Call to Action */}
-        <div className="mt-16 bg-gradient-to-r from-blue-800 to-blue-900 rounded-2xl overflow-hidden shadow-2xl">
-  <div className="p-10 text-center text-white">
-    <h2 className="text-3xl font-bold mb-4">Craft Your Jordanian Adventure</h2>
-    <p className="text-xl mb-6 text-blue-100 max-w-2xl mx-auto leading-relaxed">
-      With diverse landscapes spanning ancient forests, desert canyons, and archaeological 
-      wonders, Jordan invites you to create a journey as unique as its heritage
-    </p>
-    <button
-      onClick={() => onNavigate('fleet')}
-      className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-blue-900 px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 duration-300 shadow-lg"
-    >
-      Start Your Journey Today
-    </button>
-    <p className="mt-4 text-blue-200">
-      Local experts available 24/7 to personalize your itinerary
-    </p>
+        {/* Sister-site Promotion (replaces the previous CTA) */}
+        {/* Sister-site Promotion — Enhanced */}
+<section aria-labelledby="sister-site-cta" className="mt-16">
+  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white shadow-2xl border border-white/10">
+    {/* Background accents */}
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
+      <div className="absolute -bottom-16 -left-16 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.12),_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,transparent_55%,rgba(255,255,255,0.06)_55%,rgba(255,255,255,0.06)_57%,transparent_57%)]" />
+    </div>
+
+    <div className="relative p-6 sm:p-10">
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        {/* Copy + value props */}
+        <div>
+          <h2 id="sister-site-cta" className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+            Plan Your Adventures with <span className="text-amber-300">Above &amp; Below</span>
+          </h2>
+          <p className="mt-3 text-blue-100/90 text-base sm:text-lg leading-relaxed">
+            Love these destinations? Our sister company <span className="font-semibold">Above &amp; Below Adventures</span> crafts tailor-made trips across Jordan — from Wadi Rum’s dunes to Aqaba’s reefs and beyond.
+          </p>
+
+          {/* Value prop chips */}
+          <ul className="mt-6 flex flex-wrap gap-2">
+            <li className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm">
+              <FiStar className="text-amber-300" /><span>Top-rated local guides</span>
+            </li>
+            <li className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm">
+              <FiClock className="text-amber-300" /><span>Fast, friendly planning</span>
+            </li>
+            <li className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm">
+              <FiMapPin className="text-amber-300" /><span>Petra • Wadi Rum • Aqaba</span>
+            </li>
+          </ul>
+
+          {/* CTAs */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
+            <a
+              href="https://aboveandbelowadventuresjo.com/?utm_source=sister_site&utm_medium=cta&utm_campaign=destinations_page"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-500 text-blue-900 px-6 py-3 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/60"
+              aria-label="Visit Above & Below Adventures (opens in a new tab)"
+            >
+              <FiGlobe aria-hidden className="h-5 w-5" />
+              <span>Visit Above &amp; Below</span>
+              <FiArrowUpRight aria-hidden className="hidden sm:inline h-5 w-5" />
+            </a>
+
+            <a
+              href={typeof whatsappLink !== 'undefined' ? whatsappLink : 'https://wa.me/962797237623'}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 px-6 py-3 font-medium text-white transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              aria-label="Chat on WhatsApp"
+            >
+              <FaWhatsapp aria-hidden className="h-5 w-5 text-green-300" />
+              <span>Chat on WhatsApp</span>
+            </a>
+          </div>
+
+          <p className="mt-3 text-xs sm:text-sm text-blue-200/80">
+            Opens in a new tab • Trusted local experts
+          </p>
+        </div>
+
+        {/* Visual panel (faux preview + micro-review) */}
+        <div className="relative">
+          <div className="relative mx-auto w-full max-w-md">
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-amber-400/30 to-cyan-400/30 blur-2xl" aria-hidden="true" />
+            <div className="relative rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              {/* URL bar */}
+              <div className="flex items-center gap-2 text-white/80 text-sm">
+                <FiGlobe className="shrink-0" />
+                <span className="truncate">aboveandbelowadventuresjo.com</span>
+              </div>
+
+              {/* Faux site preview */}
+              <div className="mt-3 aspect-[16/10] w-full overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-blue-600/30 to-indigo-600/30">
+                <div className="m-4 grid grid-rows-3 gap-3 opacity-95">
+                  <div className="h-6 rounded-md bg-white/30"></div>
+                  <div className="h-24 rounded-xl bg-white/10"></div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="h-16 rounded-lg bg-white/10"></div>
+                    <div className="h-16 rounded-lg bg-white/10"></div>
+                    <div className="h-16 rounded-lg bg-white/10"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tiny testimonial */}
+              <figure className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
+                <blockquote className="text-sm text-blue-100/90">
+                  “Smooth planning, unforgettable desert nights, crystal-clear reefs — highly recommended.”
+                </blockquote>
+                <figcaption className="mt-2 text-xs text-blue-200/80">
+                  Recent guest review
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
+
 
       </div>
     </div>
