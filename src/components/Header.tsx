@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, MapPin, Home, Car, Users, Phone } from 'lucide-react';
 import logo from '../assets/logo.png';
 
+// Define the Page type here (or import it if defined elsewhere)
+type Page = 'home' | 'fleet' | 'destinations' | 'about' | 'contact';
+
 interface HeaderProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
+  currentPage: Page; // Change from string to Page
+  onNavigate: (page: Page) => void; // Change from string to Page
 }
 
 const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
@@ -20,11 +23,11 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
   }, []);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'destinations', label: 'Destinations', icon: MapPin },
-    { id: 'fleet', label: 'Fleet', icon: Car },
-    { id: 'about', label: 'About Us', icon: Users },
-    { id: 'contact', label: 'Contact', icon: Phone },
+    { id: 'home' as Page, label: 'Home', icon: Home },
+    { id: 'destinations' as Page, label: 'Destinations', icon: MapPin },
+    { id: 'fleet' as Page, label: 'Fleet', icon: Car },
+    { id: 'about' as Page, label: 'About Us', icon: Users },
+    { id: 'contact' as Page, label: 'Contact', icon: Phone },
   ];
 
   return (

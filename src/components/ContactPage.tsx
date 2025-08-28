@@ -1,4 +1,3 @@
-
 // components/ContactPage.tsx
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
@@ -9,8 +8,11 @@ const ContactPage: React.FC = () => {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
+    hp: '' // honeypot (must stay empty)
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<null | { ok: boolean; msg: string }>(null);
 
   const contactInfo = [
     { icon: Phone, title: 'Call Us', details: ['+962 79 7237623'], description: 'Available during business hours' },
@@ -23,6 +25,30 @@ const ContactPage: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setStatus({ ok: true, msg: 'Message sent! We’ll get back to you shortly.' });
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '', hp: '' });
+      } else {
+        setStatus({ ok: false, msg: data.error || 'Something went wrong. Please try again.' });
+      }
+    } catch (err) {
+      setStatus({ ok: false, msg: 'Network error. Please try again.' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -54,14 +80,22 @@ const ContactPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Formspree Contact Form */}
+        {/* Direct-to-Gmail Contact Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
-          <form
-            action="https://formspree.io/f/mrbkkdgo"
-            method="POST"
-            className="space-y-6"
-          >
+
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            {/* Honeypot field (hidden) */}
+            <input
+              type="text"
+              name="hp"
+              value={formData.hp}
+              onChange={handleInputChange}
+              className="hidden"
+              autoComplete="off"
+              tabIndex={-1}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -131,16 +165,24 @@ const ContactPage: React.FC = () => {
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                 placeholder="Tell us how we can help you..."
-              ></textarea>
+              />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center space-x-2"
+              disabled={submitting}
+              className={`w-full text-white py-4 rounded-lg font-semibold flex items-center justify-center space-x-2
+              ${submitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
             >
               <Send className="h-5 w-5" />
-              <span>Send Message</span>
+              <span>{submitting ? 'Sending...' : 'Send Message'}</span>
             </button>
+
+            {status && (
+              <p className={`text-sm mt-2 ${status.ok ? 'text-green-600' : 'text-red-600'}`}>
+                {status.msg}
+              </p>
+            )}
           </form>
         </div>
       </div>
