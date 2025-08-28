@@ -1,4 +1,5 @@
 // netlify/functions/contact.ts
+import type { Handler } from "@netlify/functions";
 import nodemailer from "nodemailer";
 
 function isEmail(s: string) {
@@ -6,38 +7,87 @@ function isEmail(s: string) {
 }
 function escapeHtml(s = "") {
   return String(s)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-const cors = (origin: string) => ({
+const corsHeaders = (origin: string) => ({
   "Access-Control-Allow-Origin": origin,
-  "Access-Control-Allow-Methods": "POST,OPTIONS",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 });
-const json = (origin: string) => ({ "Content-Type": "application/json", ...cors(origin) });
+const jsonHeaders = (origin: string) => ({
+  "Content-Type": "application/json",
+  ...corsHeaders(origin),
+});
 
-// Netlify function signature (TypeScript)
-export const handler: import("@netlify/functions").Handler = async (event) => {
+export const handler: Handler = async (event) => {
   const origin = process.env.CORS_ORIGIN || "*";
 
+  // CORS preflight
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, headers: cors(origin), body: "" };
+    return { statusCode: 204, headers: corsHeaders(origin), body: "" };
   }
+
+  // Health check for easy debugging in browser
+  if (event.httpMethod === "GET") {
+    return {
+      statusCode: 200,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({
+        ok: true,
+        using: "netlify function",
+        hasEnv: Boolean(
+          process.env.GMAIL_USER &&
+            process.env.GMAIL_APP_PASSWORD &&
+            (process.env.TO_EMAIL || process.env.GMAIL_USER)
+        ),
+      }),
+    };
+  }
+
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, headers: json(origin), body: JSON.stringify({ error: "Method not allowed" }) };
+    return {
+      statusCode: 405,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
   }
 
-  let data: any = {};
-  try { data = JSON.parse(event.body || "{}"); } catch {}
+  let data: Record<string, string> = {};
+  try {
+    data = JSON.parse(event.body || "{}");
+  } catch {
+    // ignore; handled below by validation
+  }
 
-  const { name = "", email = "", phone = "", subject = "", message = "", hp = "" } = data;
+  const {
+    name = "",
+    email = "",
+    phone = "",
+    subject = "",
+    message = "",
+    hp = "",
+  } = data;
 
-  // Honeypot for bots
-  if (hp) return { statusCode: 200, headers: json(origin), body: JSON.stringify({ ok: true }) };
+  // Honeypot: bots will fill this, humans won't
+  if (hp) {
+    return {
+      statusCode: 200,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({ ok: true }),
+    };
+  }
 
+  // Basic validation
   if (!name.trim() || !isEmail(email) || !subject.trim() || !message.trim()) {
-    return { statusCode: 400, headers: json(origin), body: JSON.stringify({ error: "Invalid input." }) };
+    return {
+      statusCode: 400,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({ error: "Invalid input." }),
+    };
   }
 
   const subjectMap: Record<string, string> = {
@@ -48,20 +98,27 @@ export const handler: import("@netlify/functions").Handler = async (event) => {
     feedback: "Feedback",
     other: "Other",
   };
- const subjectLabel = (subjectMap[subject] ?? subject) || "Contact form";
+  const subjectLabel = (subjectMap[subject] ?? subject) || "Contact form";
 
   try {
+    // Ensure env is present
+    const user = process.env.GMAIL_USER;
+    const pass = process.env.GMAIL_APP_PASSWORD;
+    const to = process.env.TO_EMAIL || user;
+    if (!user || !pass || !to) {
+      return {
+        statusCode: 500,
+        headers: jsonHeaders(origin),
+        body: JSON.stringify({ error: "Email not configured." }),
+      };
+    }
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD, // 16-digit Gmail App Password
-      },
+      auth: { user, pass },
     });
-
-    const to = process.env.TO_EMAIL || process.env.GMAIL_USER;
 
     const plain = [
       `New contact form submission`,
@@ -89,17 +146,25 @@ export const handler: import("@netlify/functions").Handler = async (event) => {
     `;
 
     await transporter.sendMail({
-      from: `"${name}" <${process.env.GMAIL_USER}>`, // authenticated Gmail must be the sender
-      replyTo: email,                                 // reply goes to the visitor
+      from: `"${name}" <${user}>`, // authenticated sender must be your Gmail
+      replyTo: email, // reply goes to the visitor
       to,
       subject: `Contact form: ${subjectLabel}`,
       text: plain,
       html,
     });
 
-    return { statusCode: 200, headers: json(origin), body: JSON.stringify({ ok: true }) };
+    return {
+      statusCode: 200,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({ ok: true }),
+    };
   } catch (err) {
     console.error("SMTP error:", err);
-    return { statusCode: 500, headers: json(origin), body: JSON.stringify({ error: "Failed to send." }) };
+    return {
+      statusCode: 500,
+      headers: jsonHeaders(origin),
+      body: JSON.stringify({ error: "Failed to send." }),
+    };
   }
 };

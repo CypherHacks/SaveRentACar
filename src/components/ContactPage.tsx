@@ -1,4 +1,4 @@
-// components/ContactPage.tsx
+// src/components/ContactPage.tsx
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
 
@@ -9,7 +9,7 @@ const ContactPage: React.FC = () => {
     phone: '',
     subject: '',
     message: '',
-    hp: '' // honeypot (must stay empty)
+    hp: '', // honeypot (must stay empty)
   });
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<null | { ok: boolean; msg: string }>(null);
@@ -32,20 +32,26 @@ const ContactPage: React.FC = () => {
     setSubmitting(true);
     setStatus(null);
     try {
-      const res = await fetch('/api/contact', {
+      // You can switch this to '/api/contact' after verifying the redirect works.
+      const res = await fetch('/.netlify/functions/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        setStatus({ ok: true, msg: 'Message sent! We’ll get back to you shortly.' });
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '', hp: '' });
-      } else {
-        setStatus({ ok: false, msg: data.error || 'Something went wrong. Please try again.' });
+
+      console.log('contact status', res.status, res.headers.get('content-type'));
+      const ct = res.headers.get('content-type') || '';
+      const payload = ct.includes('application/json') ? await res.json() : { error: await res.text() };
+      console.log('contact payload', payload);
+
+      if (!res.ok || !('ok' in payload && payload.ok === true)) {
+        throw new Error(payload.error || `HTTP ${res.status}`);
       }
-    } catch (err) {
-      setStatus({ ok: false, msg: 'Network error. Please try again.' });
+
+      setStatus({ ok: true, msg: 'Message sent! We’ll get back to you shortly.' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '', hp: '' });
+    } catch (err: any) {
+      setStatus({ ok: false, msg: err?.message || 'Network error. Please try again.' });
     } finally {
       setSubmitting(false);
     }
