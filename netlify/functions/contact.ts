@@ -31,7 +31,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 204, headers: corsHeaders(origin), body: "" };
   }
 
-  // Health check for easy debugging in browser
+  // Health check (useful for 404/500 debugging in the browser)
   if (event.httpMethod === "GET") {
     return {
       statusCode: 200,
@@ -41,8 +41,8 @@ export const handler: Handler = async (event) => {
         using: "netlify function",
         hasEnv: Boolean(
           process.env.GMAIL_USER &&
-            process.env.GMAIL_APP_PASSWORD &&
-            (process.env.TO_EMAIL || process.env.GMAIL_USER)
+          process.env.GMAIL_APP_PASSWORD &&
+          (process.env.TO_EMAIL || process.env.GMAIL_USER)
         ),
       }),
     };
@@ -57,39 +57,21 @@ export const handler: Handler = async (event) => {
   }
 
   let data: Record<string, string> = {};
-  try {
-    data = JSON.parse(event.body || "{}");
-  } catch {
-    // ignore; handled below by validation
-  }
+  try { data = JSON.parse(event.body || "{}"); } catch {}
 
-  const {
-    name = "",
-    email = "",
-    phone = "",
-    subject = "",
-    message = "",
-    hp = "",
-  } = data;
+  const { name = "", email = "", phone = "", subject = "", message = "", hp = "" } = data;
 
-  // Honeypot: bots will fill this, humans won't
+  // Honeypot
   if (hp) {
-    return {
-      statusCode: 200,
-      headers: jsonHeaders(origin),
-      body: JSON.stringify({ ok: true }),
-    };
+    return { statusCode: 200, headers: jsonHeaders(origin), body: JSON.stringify({ ok: true }) };
   }
 
-  // Basic validation
+  // Validate
   if (!name.trim() || !isEmail(email) || !subject.trim() || !message.trim()) {
-    return {
-      statusCode: 400,
-      headers: jsonHeaders(origin),
-      body: JSON.stringify({ error: "Invalid input." }),
-    };
+    return { statusCode: 400, headers: jsonHeaders(origin), body: JSON.stringify({ error: "Invalid input." }) };
   }
 
+  // Subject mapping
   const subjectMap: Record<string, string> = {
     booking: "Car Booking Inquiry",
     destinations: "Destination Information",
@@ -101,16 +83,11 @@ export const handler: Handler = async (event) => {
   const subjectLabel = (subjectMap[subject] ?? subject) || "Contact form";
 
   try {
-    // Ensure env is present
     const user = process.env.GMAIL_USER;
     const pass = process.env.GMAIL_APP_PASSWORD;
     const to = process.env.TO_EMAIL || user;
     if (!user || !pass || !to) {
-      return {
-        statusCode: 500,
-        headers: jsonHeaders(origin),
-        body: JSON.stringify({ error: "Email not configured." }),
-      };
+      return { statusCode: 500, headers: jsonHeaders(origin), body: JSON.stringify({ error: "Email not configured." }) };
     }
 
     const transporter = nodemailer.createTransport({
@@ -146,25 +123,17 @@ export const handler: Handler = async (event) => {
     `;
 
     await transporter.sendMail({
-      from: `"${name}" <${user}>`, // authenticated sender must be your Gmail
-      replyTo: email, // reply goes to the visitor
+      from: `"${name}" <${user}>`,
+      replyTo: email,
       to,
       subject: `Contact form: ${subjectLabel}`,
       text: plain,
       html,
     });
 
-    return {
-      statusCode: 200,
-      headers: jsonHeaders(origin),
-      body: JSON.stringify({ ok: true }),
-    };
+    return { statusCode: 200, headers: jsonHeaders(origin), body: JSON.stringify({ ok: true }) };
   } catch (err) {
     console.error("SMTP error:", err);
-    return {
-      statusCode: 500,
-      headers: jsonHeaders(origin),
-      body: JSON.stringify({ error: "Failed to send." }),
-    };
+    return { statusCode: 500, headers: jsonHeaders(origin), body: JSON.stringify({ error: "Failed to send." }) };
   }
 };
