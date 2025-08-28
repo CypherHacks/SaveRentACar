@@ -1,4 +1,12 @@
 [build]
-functions = "netlify/functions"
-command = "npx vite build"
-publish = "dist"
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"  # TS support
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
