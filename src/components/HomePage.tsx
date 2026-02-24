@@ -7,7 +7,7 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const HERO_BG_URL = 'https://images.unsplash.com/photo-1599842924676-1998d0ef349a?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+  const HERO_BG_URL = 'https://images.unsplash.com/photo-1599842924676-1998d0ef349a?auto=format&fit=crop&w=1600&q=70';
 
   const featuredDestinations = [
     {
@@ -67,14 +67,15 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     <div className="space-y-24">
       {/* Hero Section - Enhanced with parallax effect and dynamic text */}
       <section className="relative h-screen overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center animate-scale-slow"
-          style={{ 
-            backgroundImage: `url('${HERO_BG_URL}')`,
-            transform: 'scale(1.1)',
-            transition: 'transform 10s ease-out'
-          }}
-        ></div>
+        <img
+          src={HERO_BG_URL}
+          alt="Scenic Jordan desert road"
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover animate-scale-slow"
+          style={{ transform: 'scale(1.1)', transition: 'transform 10s ease-out' }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-black/20"></div>
         
@@ -131,9 +132,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyFeatures.map(({ icon: Icon, title, text }, idx) => (
+            {whyFeatures.map(({ icon: Icon, title, text }) => (
               <div
-                key={idx}
+                key={title}
                 className="bg-white/80 backdrop-blur-lg border border-white/30 p-8 rounded-2xl hover:shadow-xl hover:-translate-y-2 transform transition-all duration-300 text-center relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600"></div>
@@ -171,6 +172,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <img
                     src={dest.image}
                     alt={dest.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
@@ -224,6 +227,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     <img
                       src={car.image}
                       alt={car.name}
+                      loading="lazy"
+                      decoding="async"
                       className="object-contain h-56 w-full transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
@@ -242,9 +247,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {car.features.map((feat, idx) => (
+                      {car.features.map((feat) => (
                         <span
-                          key={idx}
+                          key={`${car.id}-${feat}`}
                           className="bg-gray-50 text-gray-700 text-xs px-3 py-2 rounded-lg font-medium border border-gray-100"
                         >
                           {feat}
@@ -255,9 +260,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     <div className="mb-6">
                       <div className="text-xs text-gray-500 font-medium mb-2">AVAILABLE COLORS</div>
                       <div className="flex space-x-2">
-                        {car.colors.map((color, idx) => (
+                        {car.colors.map((color) => (
                           <div
-                            key={idx}
+                            key={`${car.id}-${color}`}
                             className={`w-6 h-6 rounded-full border border-gray-200`}
                             style={{ backgroundColor: color.toLowerCase() }}
                           />

@@ -3,22 +3,18 @@ import { Star, MapPin, Clock, Car, Mountain, Castle, Leaf, Globe } from 'lucide-
 import { FiGlobe, FiMapPin, FiClock, FiStar, FiArrowUpRight } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
+const categories = [
+  { id: 'all', name: 'All Destinations' },
+  { id: 'historical', name: 'Historical Sites' },
+  { id: 'natural', name: 'Natural Wonders' },
+  { id: 'adventure', name: 'Adventure' },
+  { id: 'cultural', name: 'Cultural' },
+] as const;
 
-const DestinationsPage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-
-  const categories = [
-    { id: 'all', name: 'All Destinations' },
-    { id: 'historical', name: 'Historical Sites' },
-    { id: 'natural', name: 'Natural Wonders' },
-    { id: 'adventure', name: 'Adventure' },
-    { id: 'cultural', name: 'Cultural' },
-  ];
-
-  const destinations = [
-    {
-      id: 1,
-      name: 'Umm Qais',
+const destinations = [
+  {
+    id: 1,
+    name: 'Umm Qais',
       category: 'historical',
       image: 'https://tourism-villages.unwto.org/wp-content/uploads/2022/11/qais01.jpg',
       description: 'Perched on a hilltop with panoramic views of three countries, Umm Qais offers a journey through layered civilizations from the Roman Decapolis to Ottoman eras.',
@@ -126,22 +122,24 @@ const DestinationsPage: React.FC = () => {
       highlights: ['Stargazing', 'Copper Mine Hikes', 'Bedouin Cuisine', 'Candlelit Nights'],
       drivingTime: '3 hours from Amman',
       bestTime: 'October to April',
-      detailedDescription: 'Experience sustainable luxury in this candlelit oasis completely off-grid. By day, hike through copper-mining canyons with Bedouin guides who point out medicinal plants and Neolithic flint tools. At night, climb to the rooftop to see the Milky Way undimmed by light pollution while sipping sage tea. The lodge\'s architecture incorporates ancient Nabatean cooling techniques, maintaining perfect temperatures without electricity.'
-    },
-  ];
+    detailedDescription: 'Experience sustainable luxury in this candlelit oasis completely off-grid. By day, hike through copper-mining canyons with Bedouin guides who point out medicinal plants and Neolithic flint tools. At night, climb to the rooftop to see the Milky Way undimmed by light pollution while sipping sage tea. The lodge\'s architecture incorporates ancient Nabatean cooling techniques, maintaining perfect temperatures without electricity.'
+  },
+];
+
+const categoryIcons = {
+  historical: <Castle className="h-4 w-4" />,
+  natural: <Leaf className="h-4 w-4" />,
+  adventure: <Mountain className="h-4 w-4" />,
+  cultural: <Globe className="h-4 w-4" />,
+  default: <Star className="h-4 w-4" />
+};
+
+const DestinationsPage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const filteredDestinations = selectedCategory === 'all' 
     ? destinations 
     : destinations.filter(dest => dest.category === selectedCategory);
-
-  // Category icons mapping
-  const categoryIcons = {
-    historical: <Castle className="h-4 w-4" />,
-    natural: <Leaf className="h-4 w-4" />,
-    adventure: <Mountain className="h-4 w-4" />,
-    cultural: <Globe className="h-4 w-4" />,
-    default: <Star className="h-4 w-4" />
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-amber-50">
@@ -195,6 +193,10 @@ const DestinationsPage: React.FC = () => {
                 <img
                   src={destination.image}
                   alt={destination.name}
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={288}
                   className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-4 left-4 bg-amber-500/90 backdrop-blur px-3 py-1.5 rounded-full flex items-center">
@@ -337,7 +339,7 @@ const DestinationsPage: React.FC = () => {
             </a>
 
             <a
-              href={typeof whatsappLink !== 'undefined' ? whatsappLink : 'https://wa.me/962797237623'}
+              href="https://wa.me/962797237623"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 px-6 py-3 font-medium text-white transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"

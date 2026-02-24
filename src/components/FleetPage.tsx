@@ -18,6 +18,7 @@ const FleetPage: React.FC = () => {
   const [mode, setMode] = useState<'rental' | 'transfer'>('rental')
   const [activeTab, setActiveTab] = useState<string>('all')
   const [dateError, setDateError] = useState<string>('')
+  const [showTerms, setShowTerms] = useState(false)
   const [formErrors, setFormErrors] = useState<{ terms: boolean; age: boolean }>({
     terms: false,
     age: false,
@@ -633,12 +634,13 @@ const FleetPage: React.FC = () => {
               <div className="ml-3 text-sm">
                 <label htmlFor="terms" className="font-medium text-gray-700">
                   I agree to the{' '}
-                  <a
-                    href="#terms"
+                  <button
+                    type="button"
+                    onClick={() => setShowTerms(true)}
                     className="text-blue-600 hover:underline"
                   >
                     Terms & Conditions *
-                  </a>
+                  </button>
                 </label>
                 {formErrors.terms && (
                   <p className="mt-1 text-red-600">
@@ -697,8 +699,8 @@ const FleetPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Terms & Policies */}
-        <TermsAndConditions />
+        {/* Terms & Conditions Modal */}
+        <TermsAndConditions isOpen={showTerms} onClose={() => setShowTerms(false)} />
       </div>
     </div>
   )
