@@ -6,7 +6,6 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { SiFacebook, SiInstagram, SiTripadvisor, SiWhatsapp } from 'react-icons/si';
-import logo from '../assets/logo.png';
 
 type Page = 'home' | 'fleet' | 'destinations' | 'about' | 'contact';
 
@@ -84,11 +83,18 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-white overflow-hidden flex-shrink-0">
-              <img
-                src={logo}
-                alt="Save Rent A Car Logo"
-                className="h-full w-full object-cover"
-              />
+              <picture>
+                <source type="image/webp" srcSet="/img/logo-96.webp" />
+                <img
+                  src="/img/logo-192.png"
+                  alt="Save Rent A Car logo"
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+              </picture>
             </div>
             <div>
               <p className="text-white text-base font-semibold tracking-wide">Save Rent A Car</p>
@@ -124,7 +130,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
               if (!item.href) {
                 return (
-                  <span key={itemKey} className="inline-flex items-center gap-2 text-sm text-gray-400">
+                  <span key={itemKey} className="inline-flex items-center gap-2 text-sm text-gray-300">
                     <span className="text-amber-300">{item.icon}</span>
                     {item.text}
                   </span>
@@ -137,7 +143,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   href={item.href}
                   target={item.isExternal ? '_blank' : undefined}
                   rel={item.isExternal ? 'noopener noreferrer' : undefined}
-                  className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-amber-300 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-amber-300 transition-colors"
                 >
                   <span className="text-amber-300">{item.icon}</span>
                   {item.text}
@@ -163,10 +169,10 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </div>
 
         <div className="mt-5 border-t border-gray-800 pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400">
             © {new Date().getFullYear()} Save Rent A Car. All rights reserved.
           </p>
-          <p className="text-xs text-gray-500">Licensed by Jordan Tourism Board • Reg. No: JTB-2024-001</p>
+          <p className="text-xs text-gray-400">Licensed by Jordan Tourism Board • Reg. No: JTB-2024-001</p>
         </div>
       </div>
     </footer>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, MapPin, Home, Car, Users, Phone } from 'lucide-react';
-import logo from '../assets/logo.png';
 
 // Define the Page type here (or import it if defined elsewhere)
 type Page = 'home' | 'fleet' | 'destinations' | 'about' | 'contact';
@@ -45,18 +44,24 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
             aria-label="Go to home page"
           >
             <div className="relative group">
-              <img
-                src={logo}
-                alt="Save Rent A Car Logo"
-                className="h-24 w-24 object-contain transition-all duration-300 group-hover:rotate-[5deg] group-hover:scale-105"
-              />
+              <picture>
+                <source type="image/webp" srcSet="/img/logo-96.webp 1x, /img/logo-192.webp 2x" />
+                <img
+                  src="/img/logo-192.png"
+                  alt="Save Rent A Car logo"
+                  width={96}
+                  height={96}
+                  decoding="async"
+                  className="h-24 w-24 object-contain transition-transform duration-300 group-hover:rotate-[5deg] group-hover:scale-105"
+                />
+              </picture>
               <div className="absolute -inset-2 rounded-full border-2 border-yellow-300 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </div>
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                 Save Rent A Car
               </h1>
-              <p className="text-sm font-semibold text-yellow-700 drop-shadow-sm">
+              <p className="text-sm font-semibold text-yellow-900 drop-shadow-sm">
                 Aqaba
               </p>
             </div>
@@ -93,7 +98,9 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-3 rounded-lg text-gray-700 hover:text-yellow-900 hover:bg-white/90 transition-all duration-300 shadow-sm hover:shadow-md"
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-nav"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6 animate-spin-in" />
@@ -105,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
 
         {/* Mobile nav */}
         {isMenuOpen && (
-          <div className="md:hidden bg-gradient-to-b from-yellow-100 to-sky-200 border-t border-yellow-200 animate-fade-in">
+          <div id="mobile-nav" className="md:hidden bg-gradient-to-b from-yellow-100 to-sky-200 border-t border-yellow-200 animate-fade-in">
             <nav className="flex flex-col space-y-2 mt-2 mx-4 pb-4">
               {navItems.map(({ id, label, icon: Icon }) => (
                 <button

@@ -7,27 +7,25 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const HERO_BG_URL = 'https://images.unsplash.com/photo-1599842924676-1998d0ef349a?auto=format&fit=crop&w=1600&q=70';
-
   const featuredDestinations = [
     {
       id: 1,
       name: 'Petra',
-      image: 'https://images.pexels.com/photos/1631665/pexels-photo-1631665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      slug: 'petra',
       description: 'Ancient city carved in rose-red sandstone',
       rating: 4.9,
     },
     {
       id: 2,
       name: 'Wadi Rum',
-      image: 'https://images.pexels.com/photos/13458329/pexels-photo-13458329.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      slug: 'wadirum',
       description: 'Spectacular desert landscape and stargazing',
       rating: 4.8,
     },
     {
       id: 3,
       name: 'Dead Sea',
-      image: 'https://images.pexels.com/photos/11589243/pexels-photo-11589243.jpeg?auto=compress&cs=tinysrgb&w=600',
+      slug: 'deadsea',
       description: "Float in the world's saltiest water",
       rating: 4.7,
     },
@@ -44,7 +42,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     {
       id: 1,
       name: 'Suzuki Fronx',
-      image: 'https://s3.eu-central-1.amazonaws.com/v3-ncg.motory.com/vehicle-new/466x350/l-1703682111.7024-658c203fab7e7_outbound.webp',
+      slug: 'fronx',
+      smallW: 466,
+      largeW: 800,
       category: 'Compact SUV',
       price: 45,
       features: ['Automatic', 'AC', '5 Seats'],
@@ -54,7 +54,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     {
       id: 2,
       name: 'Kia Sonet',
-      image: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Kia/Sonet/9783/1705036728978/front-left-side-47.jpg',
+      slug: 'sonet',
+      smallW: 600,
+      largeW: 1000,
       category: 'SUV',
       price: 50,
       features: ['Automatic', 'AC', '5 Seats'],
@@ -65,19 +67,27 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-24">
-      {/* Hero Section - Enhanced with parallax effect and dynamic text */}
-      <section className="relative h-screen overflow-hidden">
-        <img
-          src={HERO_BG_URL}
-          alt="Scenic Jordan desert road"
-          fetchPriority="high"
-          loading="eager"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover animate-scale-slow"
-          style={{ transform: 'scale(1.1)', transition: 'transform 10s ease-out' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-black/20"></div>
+      {/* Hero Section */}
+      <section className="relative h-screen overflow-hidden bg-stone-900">
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/img/hero-640.webp 640w, /img/hero-960.webp 960w, /img/hero-1280.webp 1280w, /img/hero-1600.webp 1600w, /img/hero-1920.webp 1920w"
+            sizes="100vw"
+          />
+          <img
+            src="/img/hero-1280.jpg"
+            srcSet="/img/hero-640.jpg 640w, /img/hero-960.jpg 960w, /img/hero-1280.jpg 1280w, /img/hero-1600.jpg 1600w, /img/hero-1920.jpg 1920w"
+            sizes="100vw"
+            alt="Scenic Jordan desert road"
+            fetchPriority="high"
+            decoding="async"
+            width={1920}
+            height={1080}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/70"></div>
         
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
           <div className="mb-4">
@@ -169,13 +179,24 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 className="group relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               >
                 <div className="relative h-80 overflow-hidden">
-                  <img
-                    src={dest.image}
-                    alt={dest.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                  <picture>
+                    <source
+                      type="image/webp"
+                      srcSet={`/img/${dest.slug}-480.webp 480w, /img/${dest.slug}-800.webp 800w`}
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                    />
+                    <img
+                      src={`/img/${dest.slug}-800.jpg`}
+                      srcSet={`/img/${dest.slug}-480.jpg 480w, /img/${dest.slug}-800.jpg 800w`}
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                      alt={`${dest.name} – ${dest.description}`}
+                      loading="lazy"
+                      decoding="async"
+                      width={800}
+                      height={534}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  </picture>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <div className="flex justify-between items-end">
@@ -194,8 +215,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <button
                     className="bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 shadow-md transition-all duration-300 transform hover:scale-110"
                     onClick={() => onNavigate('destinations')}
+                    aria-label={`Explore ${dest.name}`}
                   >
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -224,13 +246,24 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               >
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-2/5 bg-gradient-to-b from-gray-50 to-gray-100 p-6 flex items-center justify-center">
-                    <img
-                      src={car.image}
-                      alt={car.name}
-                      loading="lazy"
-                      decoding="async"
-                      className="object-contain h-56 w-full transition-transform duration-500 group-hover:scale-105"
-                    />
+                    <picture>
+                      <source
+                        type="image/webp"
+                        srcSet={`/img/${car.slug}-${car.smallW}.webp ${car.smallW}w, /img/${car.slug}-${car.largeW}.webp ${car.largeW}w`}
+                        sizes="(min-width: 1024px) 40vw, (min-width: 768px) 40vw, 100vw"
+                      />
+                      <img
+                        src={`/img/${car.slug}-${car.largeW}.jpg`}
+                        srcSet={`/img/${car.slug}-${car.smallW}.jpg ${car.smallW}w, /img/${car.slug}-${car.largeW}.jpg ${car.largeW}w`}
+                        sizes="(min-width: 1024px) 40vw, (min-width: 768px) 40vw, 100vw"
+                        alt={`${car.name} ${car.category} rental car`}
+                        loading="lazy"
+                        decoding="async"
+                        width={car.largeW}
+                        height={Math.round((car.largeW * 350) / 466)}
+                        className="object-contain h-56 w-full transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </picture>
                   </div>
                   
                   <div className="md:w-3/5 p-8">
