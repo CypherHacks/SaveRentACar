@@ -6,17 +6,15 @@ import {
   FaPalette,
   FaCalendarAlt,
   FaUserAlt,
-  FaInfoCircle,
 } from 'react-icons/fa'
 import { FiArrowRight } from 'react-icons/fi'
 import TermsAndConditions from './TermsAndConditions'
-import { fetchCars, createBooking, Car } from '../airtable'
+import { fetchCars, createBooking, invalidateCarsCache, Car } from '../airtable'
 
 const FleetPage: React.FC = () => {
   const [cars, setCars] = useState<Car[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [mode, setMode] = useState<'rental' | 'transfer'>('rental')
-  const [activeTab, setActiveTab] = useState<string>('all')
   const [dateError, setDateError] = useState<string>('')
   const [showTerms, setShowTerms] = useState(false)
   const [formErrors, setFormErrors] = useState<{ terms: boolean; age: boolean }>({
@@ -117,6 +115,7 @@ const FleetPage: React.FC = () => {
           termsConfirmed: bookingForm.agreeTerms,
         })
         alert('Booking confirmed! Check your email for details.')
+        invalidateCarsCache()
         const updated = await fetchCars()
         setCars(updated)
         setBookingForm({
@@ -179,11 +178,6 @@ const FleetPage: React.FC = () => {
     }
   }
 
-  const filteredCars =
-    activeTab === 'all'
-      ? cars
-      : cars.filter((c) => c.category.toLowerCase() === activeTab)
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 px-6 py-12">
       <div className="max-w-7xl mx-auto space-y-16">
@@ -216,30 +210,6 @@ const FleetPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Category Tabs */}
-        {mode === 'rental' && (
-          <nav className="flex flex-wrap justify-center gap-4">
-            {['All', 'SUV', 'Sedan', 'Hatchback', 'Compact', 'Luxury'].map(
-              (tab) => {
-                const key = tab.toLowerCase()
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setActiveTab(key)}
-                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                      activeTab === key
-                        ? 'bg-blue-600 text-white shadow'
-                        : 'bg-white text-gray-600 hover:bg-blue-50'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                )
-              }
-            )}
-          </nav>
-        )}
-
         {/* Fleet Grid */}
         {mode === 'rental' ? (
           loading ? (
@@ -261,7 +231,7 @@ const FleetPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredCars.map((car) => (
+              {cars.map((car) => (
                 <div
                   key={car.id}
                   className="group flex flex-col bg-white rounded-2xl shadow transition-transform hover:-translate-y-2 hover:shadow-lg"
@@ -661,43 +631,6 @@ const FleetPage: React.FC = () => {
             </button>
           </form>
         </section>
-
-        {/* Info Cards */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: <FaInfoCircle />,
-              title: 'Flexible Options',
-              desc:
-                'Hourly, daily or weekly rentals with unlimited mileage.',
-            },
-            {
-              icon: <FaMapMarkerAlt />,
-              title: 'Pickup Locations',
-              desc:
-                'Airports, hotels, downtown and more across the city.',
-            },
-            {
-              icon: <FaInfoCircle />,
-              title: '24/7 Support',
-              desc:
-                'Our team is available around the clock.',
-            },
-          ].map((card, idx) => (
-            <div
-              key={idx}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition-transform hover:-translate-y-1"
-            >
-              <div className="text-blue-600 mb-4 text-2xl">
-                {card.icon}
-              </div>
-              <h3 className="font-bold text-lg mb-2">
-                {card.title}
-              </h3>
-              <p className="text-gray-600 text-sm">{card.desc}</p>
-            </div>
-          ))}
-        </div>
 
         {/* Terms & Conditions Modal */}
         <TermsAndConditions isOpen={showTerms} onClose={() => setShowTerms(false)} />

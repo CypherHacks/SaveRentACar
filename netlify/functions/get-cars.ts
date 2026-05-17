@@ -40,6 +40,10 @@ export const handler: Handler = async () => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
       body: JSON.stringify(cars),
     }
   } catch (err: any) {

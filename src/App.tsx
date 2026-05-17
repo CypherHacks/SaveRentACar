@@ -3,6 +3,9 @@ import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
+import { prefetchCars } from './airtable';
+
+prefetchCars();
 
 const FleetPage = lazy(() => import('./components/FleetPage'));
 const DestinationsPage = lazy(() => import('./components/DestinationsPage'));

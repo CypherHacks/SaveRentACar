@@ -12,10 +12,34 @@ export interface Car {
   bookings: string[]       // array of Booking record IDs
 }
 
-export async function fetchCars(): Promise<Car[]> {
+let carsCache: Car[] | null = null
+let carsPromise: Promise<Car[]> | null = null
+
+async function doFetchCars(): Promise<Car[]> {
   const res = await fetch('/.netlify/functions/get-cars')
   if (!res.ok) throw new Error('Failed to fetch cars')
-  return res.json()
+  const data: Car[] = await res.json()
+  carsCache = data
+  return data
+}
+
+export function prefetchCars(): void {
+  carsPromise ??= doFetchCars().catch((err) => {
+    carsPromise = null
+    throw err
+  })
+}
+
+export async function fetchCars(): Promise<Car[]> {
+  if (carsCache) return carsCache
+  if (carsPromise) return carsPromise
+  carsPromise = doFetchCars()
+  return carsPromise
+}
+
+export function invalidateCarsCache(): void {
+  carsCache = null
+  carsPromise = null
 }
 
 export interface BookingPayload {
